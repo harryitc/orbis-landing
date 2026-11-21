@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ORBIS — Hệ sinh thái toàn cầu nhìn từ quỹ đạo</title>
+    <meta name="description" content="ORBIS quan sát các hệ sinh thái của Trái Đất từ quỹ đạo: rừng mưa, sa mạc, băng cực, rạn san hô và rừng taiga — như một hệ thống sống duy nhất." />
+    <meta name="theme-color" content="#0b0a09" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" as="image" href="textures/earth_day_2048.jpg" />
+  </head>
+  <body class="is-loading is-intro">
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <!-- Cinema chrome -->
+    <div class="letterbox" aria-hidden="true">
+      <span class="lb lb--top"></span>
+      <span class="lb lb--bottom"></span>
+    </div>
+    <div class="intro-captions" aria-hidden="true">
+      <p class="intro-caption mono">ORBIS · Đài quan sát hệ sinh thái</p>
+      <p class="intro-caption intro-caption--serif">Một hành tinh. Hàng nghìn hệ sinh thái.</p>
+    </div>
+    <button class="skip mono" type="button" id="skip">Bỏ qua intro <span aria-hidden="true">→</span></button>
+
+    <div class="loader" id="loader" role="status" aria-live="polite">
+      <div class="loader__inner">
+        <span class="mono loader__label">Đang kết nối quỹ đạo</span>
+        <div class="loader__bar"><span id="loader-bar"></span></div>
+        <span class="mono loader__pct" id="loader-pct">000%</span>
+      </div>
+    </div>
+
+    <header class="nav">
+      <a class="nav__brand" href="#top" aria-label="ORBIS — về đầu trang">
+        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
+          <circle cx="16" cy="16" r="6.5" fill="currentColor" />
+          <ellipse cx="16" cy="16" rx="14" ry="5.2" fill="none" stroke="currentColor" stroke-width="1.2" transform="rotate(-24 16 16)" />
+        </svg>
+        <span>ORBIS</span>
+      </a>
+      <nav class="nav__links" aria-label="Điều hướng chính">
+        <a href="#biomes">Hệ sinh thái</a>
+        <a href="#data">Dữ liệu</a>
+        <a href="#network">Mạng lưới</a>
+        <a href="#history">Lịch sử</a>
+      </nav>
+      <a class="btn btn--ghost btn--sm" href="#join">Tham gia</a>
+    </header>
+
+    <aside class="hud mono" aria-hidden="true">
+      <div class="hud__block hud__block--left">
+        <span class="hud__k">Điểm dưới quỹ đạo</span>
+        <span class="hud__v"><span id="hud-lat">00.00°N</span> &nbsp; <span id="hud-lon">000.00°E</span></span>
+      </div>
+      <div class="hud__block hud__block--right">
+        <span class="hud__k"><span id="hud-index">01</span> / 07 · <span id="hud-name">Quỹ đạo</span></span>
+        <span class="hud__v">T+ <span id="hud-clock">00:00:00</span></span>
+      </div>
+    </aside>
+
+    <main id="main">
+      <!-- 01 HERO -->
+      <section class="hero" id="top" data-scene="hero" data-name="Quỹ đạo">
+        <div class="container hero__inner">
+          <p class="eyebrow mono" data-intro="eyebrow"><span class="dot"></span>Nhiệm vụ quan sát · Quỹ đạo thấp 408 km</p>
+          <h1 class="hero__title" data-intro="title">Nhìn Trái Đất <em>như một</em> hệ sinh thái duy nhất</h1>
+          <p class="hero__lead" data-intro="lead">
+            Từ rừng mưa Amazon đến băng Bắc Cực, mọi hệ sinh thái đều nối với nhau bằng nước, khí và sự sống.
+            ORBIS theo dõi chúng từ quỹ đạo — mỗi ngày, ở mọi vĩ độ.
+          </p>
+          <div class="hero__cta" data-intro="cta">
+            <a class="btn btn--solid" href="#biomes">Bắt đầu hành trình</a>
+            <a class="btn btn--ghost" href="#data">Xem dữ liệu</a>
+          </div>
+        </div>
+        <div class="scroll-cue mono" data-intro="cue">Cuộn để hạ quỹ đạo <span class="scroll-cue__line"></span></div>
+      </section>
+
+      <!-- 02 MANIFESTO -->
+      <section class="manifesto" data-scene="manifesto" data-name="Tuyên ngôn">
+        <div class="container manifesto__inner">
+          <p class="eyebrow mono">02 — Góc nhìn</p>
+          <p class="manifesto__text" data-words>
+            Từ độ cao 400 km, không có biên giới. Chỉ có những dòng chảy — nước, khí, bụi và sự sống — nối từng lục địa thành
+            một hệ thống <em>thở chung</em> — khi một mắt xích thay đổi, cả hành tinh cảm nhận được.
+          </p>
+        </div>
+      </section>
+
+      <!-- 03 BIOMES (sticky, scroll-driven globe focus) -->
+      <section class="biomes" id="biomes" data-scene="biomes" data-name="Hệ sinh thái">
+        <div class="biomes__sticky">
+          <div class="container biomes__layout">
+            <div class="biomes__head">
+              <p class="eyebrow mono">03 — Năm hệ sinh thái</p>
+              <h2 class="section-title reveal">Những vùng sống <em>nhìn từ trên cao</em></h2>
+            </div>
+
+            <div class="biomes__cards">
+              <article class="biome-card" data-biome="0">
+                <p class="mono biome-card__coord">03.5°S · 62.0°W</p>
+                <h3>Rừng mưa Amazon</h3>
+                <p>Rừng mưa nhiệt đới lớn nhất hành tinh. Mỗi ngày, cây rừng bơm hàng tỉ tấn hơi nước vào khí quyển, tạo nên những “dòng sông bay” tưới mưa cho cả lục địa.</p>
+                <dl class="biome-card__stats">
+                  <div><dt>Diện tích</dt><dd>~5,5 triệu km²</dd></div>
+                  <div><dt>Loài đã biết</dt><dd>~10% toàn cầu</dd></div>
+                </dl>
+              </article>
+              <article class="biome-card" data-biome="1">
+                <p class="mono biome-card__coord">23.0°N · 13.0°E</p>
+                <h3>Sa mạc Sahara</h3>
+                <p>Tưởng như cằn cỗi, nhưng bụi Sahara bay qua Đại Tây Dương mang theo phốt pho — nguồn dinh dưỡng nuôi chính rừng Amazon ở bờ bên kia.</p>
+                <dl class="biome-card__stats">
+                  <div><dt>Diện tích</dt><dd>~9,2 triệu km²</dd></div>
+                  <div><dt>Kết nối</dt><dd>Bụi → Amazon</dd></div>
+                </dl>
+              </article>
+              <article class="biome-card" data-biome="2">
+                <p class="mono biome-card__coord">76.0°N · 42.0°W</p>
+                <h3>Băng Bắc Cực</h3>
+                <p>Lớp băng trắng phản chiếu ánh nắng trở lại không gian, giữ cho hành tinh mát. Khi băng tan, đại dương tối màu hấp thụ thêm nhiệt — một vòng lặp tự khuếch đại.</p>
+                <dl class="biome-card__stats">
+                  <div><dt>Băng biển tối thiểu</dt><dd>−12%/thập kỷ</dd></div>
+                  <div><dt>Theo dõi từ</dt><dd>1979</dd></div>
+                </dl>
+              </article>
+              <article class="biome-card" data-biome="3">
+                <p class="mono biome-card__coord">18.3°S · 147.7°E</p>
+                <h3>Rạn san hô Great Barrier</h3>
+                <p>Cấu trúc sống lớn nhất Trái Đất, nhìn thấy được từ quỹ đạo. Rạn san hô chiếm chưa tới 1% đáy biển nhưng nuôi dưỡng khoảng một phần tư sinh vật biển.</p>
+                <dl class="biome-card__stats">
+                  <div><dt>Chiều dài</dt><dd>~2.300 km</dd></div>
+                  <div><dt>Sinh vật biển</dt><dd>~25% phụ thuộc</dd></div>
+                </dl>
+              </article>
+              <article class="biome-card" data-biome="4">
+                <p class="mono biome-card__coord">60.0°N · 100.0°E</p>
+                <h3>Rừng taiga Siberia</h3>
+                <p>Quần xã sinh vật trên cạn lớn nhất hành tinh. Đất than bùn và lớp băng vĩnh cửu bên dưới là một trong những kho lưu trữ carbon lớn nhất của Trái Đất.</p>
+                <dl class="biome-card__stats">
+                  <div><dt>Rừng phương Bắc</dt><dd>~⅓ rừng toàn cầu</dd></div>
+                  <div><dt>Vai trò</dt><dd>Kho carbon</dd></div>
+                </dl>
+              </article>
+            </div>
+
+            <ol class="biomes__index mono" aria-label="Danh sách hệ sinh thái">
+              <li class="is-active">Amazon</li>
+              <li>Sahara</li>
+              <li>Bắc Cực</li>
+              <li>Great Barrier</li>
+              <li>Taiga</li>
+            </ol>
+            <div class="biomes__progress" aria-hidden="true"><span></span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 STATS -->
+      <section class="stats" id="data" data-scene="stats" data-name="Dữ liệu">
+        <div class="container">
+          <p class="eyebrow mono">04 — Hành tinh bằng con số</p>
+          <h2 class="section-title reveal">Mọi thứ đều <em>được đo đếm</em></h2>
+          <div class="stats__grid">
+            <div class="stat">
+              <span class="stat__num"><span data-count="8.7" data-decimals="1">0</span><small> triệu</small></span>
+              <p class="stat__label">loài sinh vật ước tính trên Trái Đất — phần lớn chưa được đặt tên.</p>
+              <svg class="spark" viewBox="0 0 120 32" aria-hidden="true"><path d="M0 28 C18 26 30 22 44 20 S70 12 84 10 S108 5 120 3" /></svg>
+            </div>
+            <div class="stat">
+              <span class="stat__num"><span data-count="31">0</span><small>%</small></span>
+              <p class="stat__label">diện tích đất liền vẫn được rừng che phủ.</p>
+              <svg class="spark" viewBox="0 0 120 32" aria-hidden="true"><path d="M0 6 C20 7 36 9 52 12 S82 17 96 20 S112 22 120 23" /></svg>
+            </div>
+            <div class="stat">
+              <span class="stat__num"><span data-count="71">0</span><small>%</small></span>
+              <p class="stat__label">bề mặt hành tinh là đại dương — hệ sinh thái lớn nhất.</p>
+              <svg class="spark" viewBox="0 0 120 32" aria-hidden="true"><path d="M0 16 C14 10 26 22 40 16 S66 10 80 16 S106 22 120 16" /></svg>
+            </div>
+            <div class="stat">
+              <span class="stat__num"><span data-count="50">0</span><small>%</small></span>
+              <p class="stat__label">lượng oxy chúng ta hít thở đến từ thực vật phù du trong đại dương.</p>
+              <svg class="spark" viewBox="0 0 120 32" aria-hidden="true"><path d="M0 24 C16 20 28 26 44 18 S70 8 86 12 S110 6 120 4" /></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 NETWORK -->
+      <section class="network" id="network" data-scene="network" data-name="Mạng lưới">
+        <div class="container network__inner">
+          <div class="network__head">
+            <p class="eyebrow mono">05 — Mạng lưới quan sát</p>
+            <h2 class="section-title reveal">Một mạng lưới <em>không bao giờ ngủ</em></h2>
+            <p class="lead reveal">Vệ tinh quỹ đạo thấp, trạm mặt đất và cảm biến thực địa cùng truyền dữ liệu về một mô hình sống của hành tinh — cập nhật liên tục.</p>
+          </div>
+          <div class="network__cards">
+            <div class="ncard reveal">
+              <span class="ncard__num mono">24</span>
+              <h3>Vệ tinh quan sát</h3>
+              <p>Chụp toàn bộ bề mặt mỗi 3 ngày, từ dải quang học đến radar xuyên mây.</p>
+            </div>
+            <div class="ncard reveal">
+              <span class="ncard__num mono">112</span>
+              <h3>Trạm mặt đất</h3>
+              <p>Từ Svalbard đến Nairobi, đối chiếu dữ liệu vệ tinh với đo đạc thực địa.</p>
+            </div>
+            <div class="ncard reveal">
+              <span class="ncard__num mono">2,4 TB</span>
+              <h3>Dữ liệu mỗi ngày</h3>
+              <p>Mở cho nhà khoa học, nhà làm chính sách và cộng đồng bảo tồn.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 CHRONO (sticky horizontal) -->
+      <section class="chrono" id="history" data-scene="chrono" data-name="Lịch sử">
+        <div class="chrono__sticky">
+          <div class="container chrono__head">
+            <p class="eyebrow mono">06 — Nửa thế kỷ quan sát</p>
+            <h2 class="section-title">Từ bức ảnh đầu tiên <em>đến mục tiêu 2050</em></h2>
+          </div>
+          <div class="chrono__track">
+            <article class="era"><span class="era__year">1972</span><h3>Landsat 1 lên quỹ đạo</h3><p>Lần đầu tiên con người có ảnh vệ tinh liên tục về bề mặt đất liền — khởi đầu cho việc theo dõi rừng và đô thị.</p></article>
+            <article class="era"><span class="era__year">1979</span><h3>Bắt đầu đo băng biển</h3><p>Cảm biến vi sóng ghi lại diện tích băng Bắc Cực mỗi ngày, tạo nên chuỗi dữ liệu khí hậu dài nhất từ không gian.</p></article>
+            <article class="era"><span class="era__year">1999</span><h3>Vệ tinh Terra</h3><p>Quan sát đồng thời đất, biển, khí quyển và băng — Trái Đất được nhìn như một hệ thống liên kết.</p></article>
+            <article class="era"><span class="era__year">2015</span><h3>Thỏa thuận Paris</h3><p>Gần 200 quốc gia cam kết giữ mức nóng lên dưới 2°C — dữ liệu vệ tinh trở thành thước đo trách nhiệm.</p></article>
+            <article class="era"><span class="era__year">2030</span><h3>Mục tiêu 30×30</h3><p>Bảo vệ 30% đất liền và đại dương vào năm 2030, theo Khung đa dạng sinh học toàn cầu Côn Minh – Montréal.</p></article>
+            <article class="era"><span class="era__year">2050</span><h3>Phát thải ròng bằng 0</h3><p>Đích đến chung: một hành tinh nơi các hệ sinh thái có thể tự phục hồi.</p></article>
+          </div>
+          <div class="container"><div class="chrono__progress" aria-hidden="true"><span></span></div></div>
+        </div>
+      </section>
+
+      <!-- 07 FINALE -->
+      <section class="finale" id="join" data-scene="finale" data-name="Tham gia">
+        <div class="container finale__inner">
+          <p class="eyebrow mono">07 — Chấm sáng nhỏ</p>
+          <h2 class="finale__title reveal">Một chấm sáng nhỏ.<br /><em>Mọi hệ sinh thái.</em></h2>
+          <p class="lead reveal">Nhận bản tin quỹ đạo hằng tháng — hình ảnh mới nhất và những thay đổi của hành tinh, kể bằng dữ liệu.</p>
+          <form class="signup reveal" id="signup" novalidate>
+            <label class="sr-only" for="email">Email</label>
+            <input id="email" type="email" name="email" placeholder="email@cuaban.vn" autocomplete="email" required />
+            <button class="btn btn--solid" type="submit">Nhận bản tin</button>
+          </form>
+          <p class="signup__msg mono" id="signup-msg" role="status" aria-live="polite"></p>
+        </div>
+        <footer class="footer container mono">
+          <span>© 2026 ORBIS</span>
+          <span>Texture Trái Đất: Solar System Scope (CC BY 4.0), dựa trên dữ liệu NASA · Số liệu: FAO, NSIDC, NOAA</span>
+        </footer>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
